@@ -4,18 +4,19 @@
 说明：
 安装在自己电脑上，可以不用开机密码，别人动你电脑时，
 会触发程序启动进行截图，可以自己百度 “开机启动程序如何设置”
-自己设置开机自启就行了，可以设置通知方式，获取实时IP和经纬度定位等发送给你自己
+自己设置开机自启就行了，可以自行改动设置通知方式等发送给你自己
+（获取IP和定位后续再搞）
 
 程序：(由于某些原因，没有生成exe打包文件，自己百度pyinstaller库用法自行生成exe文件)
 成品自己下载，也可以自己下载源码修改，未经允许不得用于商业用途。
 '''
 
 
+
+import re
 import cv2
-import time
 import smtplib
 from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 
@@ -30,13 +31,21 @@ while(1):
 cap.release()
 cv2.destroyAllWindows()
 
-msg_from = 'qq号@qq.com'  # 发送方邮箱
-passwd = '授权码，不是qq密码'  # 填入发送方邮箱的授权码(不会就百度qq邮箱授权码)
-msg_to = 'qq号@qq.com'  # 收件人邮箱，我是自己发给自己
+
+# 使用readline()读文件，获取zh_pwd.ini文件的账号和授权码
+f = open("zh_pwd.ini",mode='r',encoding='utf-8')
+line=f.readlines()
+zh=re.search("(?<=')\w+",line[1]).group(0)
+pwd=re.search("(?<=')\w+",line[2]).group(0)
+f.close()
+
+
+msg_from = zh+'@qq.com'  # 发送方邮箱
+
+passwd = pwd  # 填入发送方邮箱的授权码(不会就百度qq邮箱授权码)
+msg_to = zh+'@qq.com'  # 收件人邮箱，我是自己发给自己
 text_content = "\n主人，有人动你电脑！！！\n\n主人，有人动你电脑！！！\n\n主人，有人动你电脑！！！" # 发送的邮件内容
 file_path = 'camera.jpg' # 需要发送的附件目录
-
-
 
 # 写成了一个通用的函数接口，想直接用的话，把参数的注释去掉就好
 def send_email(msg_from, passwd, msg_to, text_content, file_path=None):
